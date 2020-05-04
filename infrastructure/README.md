@@ -1,3 +1,4 @@
+## Deployment Steps:
 <pre>
 Step 1: STEADY_STATE  
 ALB->Prod Listener(80 port)   ->TargetGroup1(blue)  ->Original taskset  
