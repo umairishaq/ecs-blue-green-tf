@@ -20,6 +20,10 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+td_tmp.json
+tset_tmp.json
+infrastructure/GreenTaskDefinition.json
+infrastructure/GreenTaskSet.json
 
 # Include override files you do wish to add to version control using negated pattern
 #

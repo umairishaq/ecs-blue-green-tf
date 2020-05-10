@@ -1,0 +1,28 @@
+{
+    "taskDefinition": "{{ SET TASK DEFINITION }}",
+    "launchType": "FARGATE",
+    "networkConfiguration": {
+        "awsvpcConfiguration": {
+            "assignPublicIp": "DISABLED",
+            "securityGroups": [
+                "sg-064f7be06b83b49f1"
+            ],
+            "subnets": [
+                "subnet-032a96cf00eed7dbd",
+                "subnet-02649dbcdb178ec56"
+            ]
+        }
+    },
+    "loadBalancers": [
+        {
+            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-BlueS-159K5RSZ5TVMW/bf73e24f0df9f0c7",
+            "containerName": "awesome-api",
+            "containerPort": "{{ SET CONTAINER PORT }}"
+        }
+    ],
+    "serviceRegistries": [],
+    "scale": {
+        "value": 100,
+        "unit": "PERCENT"
+    }
+}

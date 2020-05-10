@@ -1,0 +1,34 @@
+{
+    "family": "BlueTaskDefinition",
+    "taskRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskRole-QOE7H4OF8ZNV",
+    "executionRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskExecutionRole-1H6TAEPT9QWPF",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "awesome-api",
+            "image": "{{REPLACE_IMAGE}}",
+            "portMappings": [
+                {
+                    "containerPort": "{{REPLACE_CONTAINER_PORT}}",
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "MyTestStack2-ServiceLogGroup-KMP39GCMEJVI",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "Service"
+                },
+                "secretOptions": []
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "inferenceAccelerators": []
+}

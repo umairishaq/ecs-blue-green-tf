@@ -161,6 +161,16 @@ Outputs:
       - ""
       - - http://
         - !GetAtt LoadBalancer.DNSName
+  EcrRepoName:
+    Description: A name for the ECR repo.
+    Value: !Ref AwesomeAppRepository
+    Export:
+      Name: EcsBGSampleStack:EcrRepoName
+  EcrRepoArn:
+    Description: A ARN for the ECR repo.
+    Value: !GetAtt AwesomeAppRepository.Arn
+    Export:
+      Name: EcsBGSampleStack:EcrRepoArn
   BlueServiceTargetGroup:
     Description: A reference to the blue target group.
     Value: !Ref BlueServiceTargetGroup

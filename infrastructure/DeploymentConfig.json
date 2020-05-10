@@ -1,0 +1,7 @@
+{
+    "nextEnvironment": "Green",
+    "appImage": "807080734664.dkr.ecr.us-east-1.amazonaws.com/awesome-api-repository:2a8b65f",
+    "containerPort": 9000,
+    "serviceArn": "arn:aws:ecs:us-east-1:807080734664:service/AwesomeApiService",
+    "clusterArn": "arn:aws:ecs:us-east-1:807080734664:cluster/BlueGreenCluster"
+}
