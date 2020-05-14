@@ -15,4 +15,4 @@ APP_DIR=$(ROOT_PATH)/src
 .PHONY: build-image
 ## build-image: builds the docker image
 build-image:
-	docker build -t $(APP_NAME) $(GIT_HASH) $(APP_DIR)
+	docker build -t $(APP_NAME):$(GIT_HASH) $(APP_DIR)
