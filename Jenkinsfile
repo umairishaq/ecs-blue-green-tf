@@ -22,7 +22,7 @@ pipeline {
 
                 sh 'echo "============================================="'
                 sh 'printenv'
-                sh '$(aws ecr get-login --registry-ids $AWS_ACCOUNT_NUMBER)'
+                sh '$(aws ecr get-login --no-include-email --registry-ids $AWS_ACCOUNT_NUMBER)'
             }
         }
     }
