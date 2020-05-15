@@ -2,6 +2,7 @@ pipeline {
     agent none
     environment { 
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
+        REGION = sh 'make configured-region'
     }
     stages {
         stage('Build') {
@@ -13,12 +14,14 @@ pipeline {
         stage('EcrPush') {
             agent any
             steps {
-                sh 'export REGION=$(aws configure get region)'
-                sh 'echo "..............................."'
+                script {
+                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = value }
+                }
+                sh 'echo "============================================="'
                 sh 'printenv'
                 script {
-                    readProperties(file: 'Makefile.env').each { key, value -> tv = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER)
-                                                                              env[key] = tv.replace("REGION", env.REGION)
+                    // readProperties(file: 'Makefile.env').each { key, value -> tv = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER)
+                    //                                                           env[key] = tv.replace("REGION", env.REGION)
                                                               }
                     sh 'echo "..............................."'
                 }
