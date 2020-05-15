@@ -10,7 +10,7 @@ pipeline {
                 sh 'make build-image'
             }
         }
-        stage('EcrPush') {
+        stage('EcrLogin') {
             agent any
             steps {
                 script {
@@ -22,6 +22,8 @@ pipeline {
                 sh 'printenv'
                 sh '$(aws ecr get-login --no-include-email --registry-ids $AWS_ACCOUNT_NUMBER)'
             }
+        }
+        stage('EcrPush') {
             steps {
                 def PUSH_RESULT = sh (
                     script: "make push-image",
