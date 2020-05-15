@@ -57,7 +57,7 @@ pipeline {
                     writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
                     def registerTaskDefinitionOutput = sh (
-                    script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
+                    script: "aws ecs register-task-definition --cli-input-json file://$TEMPLATE_BASE_PATH/$TASK_DEFINITION_FILE",
                     returnStdout: true
                     ).trim()
                     registerTaskDefOutput = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
