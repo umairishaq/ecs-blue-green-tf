@@ -4,9 +4,19 @@ pipeline {
         stage('Build') {
             agent any
             steps {
-                sh 'echo $GIT_COMMIT'
+                sh 'whoami'
                 sh 'echo "============================================="'
+                sh 'printenv'
                 sh 'make'
+            }
+        }
+        stage('EcrLogin') {
+            agent any
+            environment { 
+                AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE') 
+            }
+            steps {
+                sh 'aws ecr get-login --registry-ids $AWS_ACCOUNT_NUMBER'
             }
         }
     }
