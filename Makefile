@@ -27,4 +27,7 @@ push-image:
 configured-region:
 	@echo $(REGION)
 
+.PHONY: latest_image
+latest_image:
+	@echo $(AWS_ACCOUNT_NUMBER).dkr.ecr.$(REGION).amazonaws.com/$(REPO_NAME):$(GIT_COMMIT)
 
