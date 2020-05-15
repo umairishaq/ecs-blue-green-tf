@@ -60,8 +60,8 @@ pipeline {
                     script: "aws ecs register-task-definition --cli-input-json file://${taskDefFile}",
                     returnStdout: true
                     ).trim()
-                    registerTaskDefOutput = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
-                    writeJSON(file: registerTaskDefinitionOutput, json: registerTaskDefinitionOutput, pretty: 2)
+                    registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
+                    writeJSON(file: registerTaskDefOutputFile, json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
