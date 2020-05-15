@@ -37,6 +37,7 @@ pipeline {
         stage('RegisterTaskDefinition') {
             agent any
             steps {
+                sh 'printenv'
                 script {
                     def newImage = sh (
                     script: "make latest_image",
@@ -56,11 +57,11 @@ pipeline {
                     taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT
                     writeJSON(file: env.TASK_DEFINITION_FILE, json: taskDefinitionTemplate)
                     
-                    def registerTaskDefinitionOutput = sh (
-                    script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
-                    returnStdout: true
-                    ).trim()
-                    writeJSON(file: env.TEMPLATE_BASE_PATH + '/taskdefout.json', json: registerTaskDefinitionOutput, pretty: 2)
+                    // def registerTaskDefinitionOutput = sh (
+                    // script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
+                    // returnStdout: true
+                    // ).trim()
+                    // writeJSON(file: env.TEMPLATE_BASE_PATH + '/taskdefout.json', json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
