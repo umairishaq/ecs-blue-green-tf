@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     readProperties(file: 'Makefile.env').each { key, value -> tv = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER)
-                                                                              env[key] = tv
+                                                                              env[key] = tv.replace("REGION", env['REGION'])
                                                               }
                 }
 
