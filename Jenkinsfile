@@ -16,7 +16,13 @@ pipeline {
                 AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE') 
             }
             steps {
-                sh 'aws ecr get-login --registry-ids $AWS_ACCOUNT_NUMBER'
+                script {
+                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = value }
+                }
+
+                sh 'echo "============================================="'
+                sh 'printenv'
+                sh '$(aws ecr get-login --registry-ids $AWS_ACCOUNT_NUMBER)'
             }
         }
     }
