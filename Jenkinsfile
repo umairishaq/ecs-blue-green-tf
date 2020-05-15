@@ -24,7 +24,7 @@ pipeline {
                 sh 'printenv'
                 sh '$(aws ecr get-login --no-include-email --registry-ids $AWS_ACCOUNT_NUMBER)'
                 PUSH_RESULT = sh (
-                    script: "make push-image"
+                    script: "make push-image",
                     returnStdout: true
                 ).trim()
                 sh 'echo "============================================="'
