@@ -37,7 +37,6 @@ pipeline {
         stage('RegisterTaskDefinition') {
             agent any
             steps {
-                sh 'printenv'
                 script {
                     def newImage = sh (
                     script: "make latest_image",
@@ -46,15 +45,22 @@ pipeline {
                     def templateFile = 'file'
                     if ( env.NEXT_ENV == 'Green'){
                         echo 'Greeeeeeeeeen'
-                        templateFile = 'infrastructure/GreenTaskDefinition.template.json'
+                        templateFile =  env.TEMPLATE_BASE_PATH + '/GreenTaskDefinition.template.json'
                     }
                     else {
-                        templateFile = 'infrastructure/BlueTaskDefinition.template.json'
+                        templateFile = env.TEMPLATE_BASE_PATH +'/BlueTaskDefinition.template.json'
                     }
 
                     def taskDefinitionTemplate = readJSON(file: templateFile)
                     taskDefinitionTemplate.containerDefinitions[0].image = newImage
-                    writeJSON(file: 'infrastructure/output.json', json: taskDefinitionTemplate)
+                    taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT
+                    writeJSON(file: env.TASK_DEFINITION_FILE, json: taskDefinitionTemplate)
+                    
+                    def registerTaskDefinitionOutput = sh (
+                    script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
+                    returnStdout: true
+                    ).trim()
+                    writeJSON(file: env.TEMPLATE_BASE_PATH + '/taskdefout.json', json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
