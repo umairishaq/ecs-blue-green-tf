@@ -29,7 +29,6 @@ pipeline {
                     script: "make push-image",
                     returnStdout: true
                     ).trim()
-                    sh 'echo "============================================="'
                     echo "Push result: ${PUSH_RESULT}"
                 }
             }
@@ -45,23 +44,24 @@ pipeline {
                     ).trim()
                     def templateFile = 'file'
                     if ( env.NEXT_ENV == 'Green'){
-                        echo 'Greeeeeeeeeen'
-                        templateFile =  env.TEMPLATE_BASE_PATH + '/GreenTaskDefinition.template.json'
+                        templateFile =  env.TEMPLATE_BASE_PATH + '/' + GREEN_TASK_DEF_TEMPLATE
                     }
                     else {
-                        templateFile = env.TEMPLATE_BASE_PATH +'/BlueTaskDefinition.template.json'
+                        templateFile = env.TEMPLATE_BASE_PATH +'/' + BLUE_TASK_DEF_TEMPLATE
                     }
 
                     def taskDefinitionTemplate = readJSON(file: templateFile)
                     taskDefinitionTemplate.containerDefinitions[0].image = newImage
                     taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT
-                    writeJSON(file: env.TASK_DEFINITION_FILE, json: taskDefinitionTemplate)
+                    taskDefFile = env.TEMPLATE_BASE_PATH + env.TASK_DEFINITION_FILE
+                    writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
-                    // def registerTaskDefinitionOutput = sh (
-                    // script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
-                    // returnStdout: true
-                    // ).trim()
-                    // writeJSON(file: env.TEMPLATE_BASE_PATH + '/taskdefout.json', json: registerTaskDefinitionOutput, pretty: 2)
+                    def registerTaskDefinitionOutput = sh (
+                    script: "aws ecs register-task-definition --cli-input-json file://$TASK_DEFINITION_FILE",
+                    returnStdout: true
+                    ).trim()
+                    registerTaskDefOutput = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
+                    writeJSON(file: registerTaskDefinitionOutput, json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
