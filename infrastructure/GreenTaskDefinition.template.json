@@ -1,15 +1,15 @@
 {
     "family": "GreenTaskDefinition",
-    "taskRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskRole-QOE7H4OF8ZNV",
-    "executionRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskExecutionRole-1H6TAEPT9QWPF",
+    "taskRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskRole-7QQJPM39M4PS",
+    "executionRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskExecutionRole-23ECK96CGGEE",
     "networkMode": "awsvpc",
     "containerDefinitions": [
         {
             "name": "awesome-api",
-            "image": "{{REPLACE_IMAGE}}",
+            "image": "nginx",
             "portMappings": [
                 {
-                    "containerPort": "{{REPLACE_CONTAINER_PORT}}",
+                    "containerPort": 80,
                     "protocol": "tcp"
                 }
             ],
@@ -17,7 +17,7 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "MyTestStack2-ServiceLogGroup-KMP39GCMEJVI",
+                    "awslogs-group": "MyTestStack2-ServiceLogGroup-15RBFZI8YJIA8",  
                     "awslogs-region": "us-east-1",
                     "awslogs-stream-prefix": "Service"
                 },
