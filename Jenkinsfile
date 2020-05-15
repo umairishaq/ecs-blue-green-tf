@@ -53,11 +53,11 @@ pipeline {
                     def taskDefinitionTemplate = readJSON(file: templateFile)
                     taskDefinitionTemplate.containerDefinitions[0].image = newImage
                     taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT
-                    taskDefFile = env.TEMPLATE_BASE_PATH + env.TASK_DEFINITION_FILE
+                    taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
                     writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
                     def registerTaskDefinitionOutput = sh (
-                    script: "aws ecs register-task-definition --cli-input-json file://$TEMPLATE_BASE_PATH/$TASK_DEFINITION_FILE",
+                    script: "aws ecs register-task-definition --cli-input-json file://${taskDefFile}",
                     returnStdout: true
                     ).trim()
                     registerTaskDefOutput = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
