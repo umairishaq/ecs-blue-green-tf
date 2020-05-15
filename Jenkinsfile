@@ -17,7 +17,7 @@ pipeline {
             }
             steps {
                 script {
-                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER) }
+                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER).replace("REGION", env.REGION) }
                 }
 
                 sh 'echo "============================================="'
