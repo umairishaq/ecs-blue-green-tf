@@ -2,7 +2,6 @@ pipeline {
     agent none
     environment { 
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
-        REGION = sh 'make configured-region'
     }
     stages {
         stage('Build') {
