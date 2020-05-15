@@ -17,7 +17,7 @@ pipeline {
             }
             steps {
                 script {
-                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = $(value) }
+                    readProperties(file: 'Makefile.env').each { key, value -> env[key] = value }
                 }
 
                 sh 'echo "============================================="'
