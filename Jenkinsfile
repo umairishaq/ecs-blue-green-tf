@@ -18,10 +18,10 @@ pipeline {
                 }
                 sh 'echo "============================================="'
                 sh 'printenv'
-                script {
+                // script {
                     // readProperties(file: 'Makefile.env').each { key, value -> tv = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER)
                     //                                                           env[key] = tv.replace("REGION", env.REGION)
-                                                              }
+                                                            //   }
                     sh 'echo "..............................."'
                 }
                 sh 'echo "============================================="'
