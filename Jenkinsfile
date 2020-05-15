@@ -2,9 +2,6 @@ pipeline {
     agent none
     environment { 
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
-        script {
-            readProperties(file: 'Makefile.env').each { key, value -> env[key] = value }
-        } 
     }
     stages {
         stage('Build') {
