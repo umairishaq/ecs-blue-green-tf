@@ -15,7 +15,7 @@ pipeline {
             steps {
                 sh 'echo "..............................."'
                 script {
-                    sh 'REGION=$(aws configure get region)'
+                    sh 'export REGION=$(aws configure get region)'
                     readProperties(file: 'Makefile.env').each { key, value -> tv = value.replace("AWS_ACCOUNT_NUMBER", env.AWS_ACCOUNT_NUMBER)
                                                                               env[key] = tv.replace("REGION", env.REGION)
                                                               }
