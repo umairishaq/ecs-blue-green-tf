@@ -13,7 +13,8 @@ pipeline {
         stage('EcrLogin') {
             agent any
             environment { 
-                AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE') 
+                AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
+                REGION = sh 'aws configure get region' 
             }
             steps {
                 script {
