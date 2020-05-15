@@ -52,7 +52,7 @@ pipeline {
 
                     def taskDefinitionTemplate = readJSON(file: templateFile)
                     taskDefinitionTemplate.containerDefinitions[0].image = newImage
-                    taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT
+                    taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT.toInteger()
                     taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
                     writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
