@@ -8,12 +8,12 @@ pipeline {
             agent any
             steps {
                 sh 'make build-image'
-                sh 'export REGION=$(aws configure get region)'
             }
         }
         stage('EcrPush') {
             agent any
             steps {
+                sh 'export REGION=$(aws configure get region)'
                 sh 'echo "..............................."'
                 sh 'printenv'
                 script {
