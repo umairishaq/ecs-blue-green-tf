@@ -18,10 +18,11 @@ pipeline {
                                                                               env[key] = tv.replace("REGION", env.REGION)
                                                               }
                 }
-
                 sh 'echo "============================================="'
                 sh 'printenv'
                 sh '$(aws ecr get-login --no-include-email --registry-ids $AWS_ACCOUNT_NUMBER)'
+            }
+            steps {
                 def PUSH_RESULT = sh (
                     script: "make push-image",
                     returnStdout: true
