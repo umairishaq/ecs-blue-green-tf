@@ -99,9 +99,12 @@ pipeline {
                     returnStdout: true
                     ).trim()
 
-                    echo "Task Definition List: ${latestTaskDefArn}"
+                    echo "Task Definition List: ${latestTaskDefArn.taskDefinitionArns[0]}"
+                    echo "===================================================="
+                    echo "TG GP from ENV: ${targetGroupArn}"
+                    echo "TG ARN: ${taskSetTemplateJson.loadBalancers[0].targetGroupArn}"
                     def taskSetTemplateJson = readJSON(file: taskSetTemplateFile)
-                    taskSetTemplateJson.taskDefinition = latestTaskDefArn[0]
+                    taskSetTemplateJson.taskDefinition = latestTaskDefArn.taskDefinitionArns[0]
                     taskSetTemplateJson.loadBalancers[0].containerPort = env.APP_PORT.toInteger()
                     taskSetTemplateJson.loadBalancers[0].targetGroupArn = targetGroupArn
                     writeJSON(file: taskSetFile, json: taskSetTemplateJson, pretty: 2)
