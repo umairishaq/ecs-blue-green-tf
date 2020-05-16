@@ -68,7 +68,7 @@ pipeline {
                     ).trim()
                     echo "Register Task Def result: ${registerTaskDefinitionOutput}"
 
-                    registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
+                    def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
                     writeJSON(file: registerTaskDefOutputFile, json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
@@ -82,6 +82,7 @@ pipeline {
                     def taskSetFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_SET_FILE
                     def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
                     def targetGroupArn = 'tg'
+                    def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
 
                     if ( env.NEXT_ENV == 'Green' ){
                         taskFamily = env.GREEN_TASK_FAMILY_PREFIX
@@ -94,17 +95,10 @@ pipeline {
                         targetGroupArn = env.BLUE_TARGET_GROUP_ARN
                     }
 
-                    def latestTaskDefArn = sh (
-                    script: "aws ecs list-task-definitions --family-prefix ${taskFamily} --status ACTIVE --sort DESC",
-                    returnStdout: true
-                    ).trim()
+                    def registerTaskDefinitionOutput = readJSON(file: registerTaskDefOutputFile)
 
-                    echo "Task Definition List: ${latestTaskDefArn.taskDefinitionArns[0]}"
-                    echo "===================================================="
-                    echo "TG GP from ENV: ${targetGroupArn}"
-                    echo "TG ARN: ${taskSetTemplateJson.loadBalancers[0].targetGroupArn}"
                     def taskSetTemplateJson = readJSON(file: taskSetTemplateFile)
-                    taskSetTemplateJson.taskDefinition = latestTaskDefArn.taskDefinitionArns[0]
+                    taskSetTemplateJson.taskDefinition = registerTaskDefinitionOutput.taskDefinitionArn
                     taskSetTemplateJson.loadBalancers[0].containerPort = env.APP_PORT.toInteger()
                     taskSetTemplateJson.loadBalancers[0].targetGroupArn = targetGroupArn
                     writeJSON(file: taskSetFile, json: taskSetTemplateJson, pretty: 2)
