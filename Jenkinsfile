@@ -119,16 +119,18 @@ pipeline {
         stage('UpdatePrimaryTaskSet'){
             agent any
             steps{
-                def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
-                def upatePrimaryTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.UPDATE_PRIMARY_TASK_SET_OUTPUT
-                def createTaskSetOutput = readJSON(file: createTaskSetOutputFile)
+                script{
+                    def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
+                    def upatePrimaryTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.UPDATE_PRIMARY_TASK_SET_OUTPUT
+                    def createTaskSetOutput = readJSON(file: createTaskSetOutputFile)
 
-                def updatePrimaryTaskSetOutput = sh (
-                    script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSetArn}",
-                    returnStdout: true
-                    ).trim()
-                    echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
-                    writeJSON(file: upatePrimaryTaskSetOutputFile, json: updatePrimaryTaskSetOutput, pretty: 2)
+                    def updatePrimaryTaskSetOutput = sh (
+                        script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSetArn}",
+                        returnStdout: true
+                        ).trim()
+                        echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
+                        writeJSON(file: upatePrimaryTaskSetOutputFile, json: updatePrimaryTaskSetOutput, pretty: 2)
+                }
             }
         }
     }
