@@ -49,4 +49,15 @@ jq --slurpfile config $CONFIG_FILE '.loadBalancers[0].containerPort=$config[0].c
 SERVICE_ARN=$(cat $CONFIG_FILE | jq -r '.serviceArn')
 CLUSTER_ARN=$(cat $CONFIG_FILE | jq -r '.clusterArn')
 
-aws ecs create-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --cli-input-json file://$TASK_SET
+TASK_SET_CREATE_RESPONSE=$(aws ecs create-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --cli-input-json file://$TASK_SET)
+GREEN_TASK_SET_ARN=echo $TASK_SET_CREATE_RESPONSE | jq -r '.taskSetArn'
+
+aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set $GREEN_TASK_SET_ARN
+
+# Wait for validation
+sleep 30
+
+
+# Update blue listener to point to green TG.
+# Update green listener to point to blue TG.
+# 

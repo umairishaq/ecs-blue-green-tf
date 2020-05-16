@@ -1,7 +1,7 @@
 {
     "family": "GreenTaskDefinition",
-    "taskRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskRole-7QQJPM39M4PS",
-    "executionRoleArn": "arn:aws:iam::807080734664:role/MyTestStack2-TaskExecutionRole-23ECK96CGGEE",
+    "taskRoleArn": "TASK ROLE",
+    "executionRoleArn": "TASK EXEC ROLE",
     "networkMode": "awsvpc",
     "containerDefinitions": [
         {

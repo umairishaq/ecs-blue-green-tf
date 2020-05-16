@@ -1,11 +1,11 @@
 {
-    "taskDefinition": "{{ SET TASK DEFINITION }}",
+    "taskDefinition": "some task definition",
     "launchType": "FARGATE",
     "networkConfiguration": {
         "awsvpcConfiguration": {
             "assignPublicIp": "DISABLED",
             "securityGroups": [
-                "sg-064f7be06b83b49f1"
+                "sg-0d087941bf1cb2075"
             ],
             "subnets": [
                 "subnet-032a96cf00eed7dbd",
@@ -15,9 +15,9 @@
     },
     "loadBalancers": [
         {
-            "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-Green-1VJDM87DLPGHJ/96f612cd8e255d31",
+            "targetGroupArn": "GREEN TG ARN",
             "containerName": "awesome-api",
-            "containerPort": "{{ SET CONTAINER PORT }}"
+            "containerPort": 80
         }
     ],
     "serviceRegistries": [],

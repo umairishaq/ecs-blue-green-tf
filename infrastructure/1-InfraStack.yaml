@@ -14,6 +14,10 @@ Parameters:
     Description: The port the app is listening on. Normally, specified in Dockerfile for a container.
     Type: Number
     Default: 80
+  SecondaryAppListenPort:
+    Description: The port the app is listening on. Normally, specified in Dockerfile for a container.
+    Type: Number
+    Default: 9000
   BlueLBPort:
     Description: The port exposed on LB for Blue TG. This maybe different from the App port.
     Type: Number
@@ -144,6 +148,16 @@ Resources:
       FromPort: !Ref AppListenPort
       ToPort: !Ref AppListenPort
 
+  LoadBalancerSecurityGroupToServiceSecurityGroupEgress2:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      Description: Load balancer to target
+      GroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+      DestinationSecurityGroupId: !GetAtt ServiceSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: !Ref SecondaryAppListenPort
+      ToPort: !Ref SecondaryAppListenPort
+
   LoadBalancerSecurityGroupToServiceSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -153,6 +167,16 @@ Resources:
       IpProtocol: tcp
       FromPort: !Ref AppListenPort
       ToPort: !Ref AppListenPort
+
+  LoadBalancerSecurityGroupToServiceSecurityGroupIngress2:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Load balancer to target
+      GroupId: !GetAtt ServiceSecurityGroup.GroupId
+      SourceSecurityGroupId: !GetAtt LoadBalancerSecurityGroup.GroupId
+      IpProtocol: tcp
+      FromPort: !Ref SecondaryAppListenPort
+      ToPort: !Ref SecondaryAppListenPort
 
 
 Outputs:
@@ -210,6 +234,11 @@ Outputs:
     Value: !Ref AppListenPort
     Export:
       Name: EcsBGSampleStack:AppListenPort
+  SecondaryAppListenPort:
+    Description: The port the app is listening on.
+    Value: !Ref SecondaryAppListenPort
+    Export:
+      Name: EcsBGSampleStack:SecondaryAppListenPort
   BlueLBPort:
     Description: The port the LB is listening for Blue TG.
     Value: !Ref BlueLBPort
