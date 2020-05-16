@@ -96,10 +96,6 @@ pipeline {
                     }
 
                     def registerTaskDefinitionOutput = readJSON(file: registerTaskDefOutputFile)
-
-                    echo "RegisterTask ARN: ${registerTaskDefinitionOutput.taskDefinition.taskDefinitionArn}"
-                    echo "================================"
-                    echo "RegisterTask Output: ${registerTaskDefinitionOutput}"
                     def taskSetTemplateJson = readJSON(file: taskSetTemplateFile)
                     taskSetTemplateJson.taskDefinition = registerTaskDefinitionOutput.taskDefinition.taskDefinitionArn
                     taskSetTemplateJson.loadBalancers[0].containerPort = env.APP_PORT.toInteger()
@@ -111,7 +107,7 @@ pipeline {
                     script: "aws ecs create-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --cli-input-json file://${taskSetFile}",
                     returnStdout: true
                     ).trim()
-                    echo "Create Task Set Result Arn: ${createTaskSetOutput.taskSetArn}"
+                    echo "Create Task Set Result: ${createTaskSetOutput.taskSet.taskSetArn}"
 
                     writeJSON(file: createTaskSetOutputFile, json: createTaskSetOutput, pretty: 2)
                 }
@@ -126,7 +122,7 @@ pipeline {
                     def createTaskSetOutput = readJSON(file: createTaskSetOutputFile)
 
                     def updatePrimaryTaskSetOutput = sh (
-                        script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSetArn}",
+                        script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSet.taskSetArn}",
                         returnStdout: true
                         ).trim()
                         echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
