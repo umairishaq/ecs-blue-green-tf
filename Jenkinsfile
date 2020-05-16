@@ -107,7 +107,7 @@ pipeline {
                     script: "aws ecs create-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --cli-input-json file://${taskSetFile}",
                     returnStdout: true
                     ).trim()
-                    echo "Create Task Set Result: ${createTaskSetOutput.taskSet.taskSetArn}"
+                    echo "Create Task Set Result: ${createTaskSetOutput}"
 
                     writeJSON(file: createTaskSetOutputFile, json: createTaskSetOutput, pretty: 2)
                 }
