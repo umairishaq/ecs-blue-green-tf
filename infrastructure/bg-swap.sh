@@ -57,6 +57,8 @@ aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTE
 # Wait for validation
 sleep 30
 
+# ************* aws ecs delete-task-set --task-set ecs-svc/7771398481905376234 --service AwesomeApiService --cluster BlueGreenCluster ********
+# IMP: need to delete the old task set because 5 is the limit.
 
 # Update blue listener to point to green TG.
 # Update green listener to point to blue TG.
