@@ -123,7 +123,7 @@ pipeline {
                     ).trim()
 
                     def clusterDetails = readJSON(text: describeClusterResult)
-                    clusterDetails.services[0].taskSets.eachWithIndex { a, i -> updateTime = new Date((long)(a.updatedA*1000))
+                    clusterDetails.services[0].taskSets.eachWithIndex { a, i -> updateTime = new Date((long)(a.updatedAt*1000))
                         echo "Index ${i}, time ${updateTime}"
                         echo "..................................................."
                     }
