@@ -97,11 +97,11 @@ pipeline {
 
                     def registerTaskDefinitionOutput = readJSON(file: registerTaskDefOutputFile)
 
-                    echo "RegisterTask Output: ${registerTaskDefinitionOutput.taskDefinitionArn}"
+                    echo "RegisterTask ARN: ${registerTaskDefinitionOutput.taskDefinition.taskDefinitionArn}"
                     echo "================================"
                     echo "RegisterTask Output: ${registerTaskDefinitionOutput}"
                     def taskSetTemplateJson = readJSON(file: taskSetTemplateFile)
-                    taskSetTemplateJson.taskDefinition = registerTaskDefinitionOutput.taskDefinitionArn
+                    taskSetTemplateJson.taskDefinition = registerTaskDefinitionOutput.taskDefinition.taskDefinitionArn
                     taskSetTemplateJson.loadBalancers[0].containerPort = env.APP_PORT.toInteger()
                     taskSetTemplateJson.loadBalancers[0].targetGroupArn = targetGroupArn
                     writeJSON(file: taskSetFile, json: taskSetTemplateJson, pretty: 2)
