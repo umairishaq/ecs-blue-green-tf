@@ -26,7 +26,7 @@ pipeline {
                 }
             }
         }
-        stage('RegisterTaskDefinition') {
+        stage('SetEnvironment'){
             agent any
             steps {
                 script {
@@ -35,6 +35,11 @@ pipeline {
                                                                               env[key] = tv.replace("REGION", env.REGION)
                                                               }
                 }
+            }
+        }
+        stage('RegisterTaskDefinition') {
+            agent any
+            steps {
                 sh 'printenv'
                 script {
                     def newImage = sh (
