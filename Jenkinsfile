@@ -226,7 +226,7 @@ pipeline {
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     // def builder = new JsonBuilder(listenerTemplateJson)
                     
-                    def slurped = new JsonSlurper().parseText(content)
+                    def slurped = new JsonSlurperClassic().parseText(content)
 
                     echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     echo "==============================================="
