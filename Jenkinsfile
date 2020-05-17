@@ -1,4 +1,5 @@
 import groovy.json.JsonOutput
+import groovy.json.JsonBuilder
 
 pipeline {
     agent none
@@ -206,13 +207,15 @@ pipeline {
                     // def listenerTemplateFile = 'infrastructure/ListenerDefaultAction.template.json'
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
-                    def listenerTemplateJson = readJSON(file: listenerTemplateFile)
+                    def listenerTemplateJson = readJSON(file: listenerTemplateFile, returnPojo: true)
+                    def builder = new JsonBuilder(listenerTemplateJson)
+
                     echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     echo "==============================================="
-                    echo "The loaded template: ${listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups']}"
+                    echo "The loaded template: ${builder['DefaultActions']['ForwardConfig']['TargetGroups']}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
                     // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
-                    writeJSON(file: listenerTemplateJson, json: listenerTemplateJson, pretty: 2)
+                    writeJSON(file: defaultActionsFile, json: builder.toPrettyString(), pretty: 2)
                 }
             }
         }
