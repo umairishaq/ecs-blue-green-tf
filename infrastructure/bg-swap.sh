@@ -60,6 +60,12 @@ sleep 30
 # ************* aws ecs delete-task-set --task-set ecs-svc/7771398481905376234 --service AwesomeApiService --cluster BlueGreenCluster ********
 # IMP: need to delete the old task set because 5 is the limit.
 
+# Doesn't quite work. need to delete oldest one.
+# aws ecs update-task-set --cluster arn:aws:ecs:us-east-1:807080734664:cluster/BlueGreenCluster --service arn:aws:ecs:us-east-1:807080734664:service/AwesomeApiService --task-set arn:aws:ecs:us-east-1:807080734664:task-set/BlueGreenCluster/AwesomeApiService/ecs-svc/7016605822699692712 --scale value=0,unit=PERCENT
+# aws ecs describe-services --services AwesomeApiService --cluster BlueGreenCluster
+# Delete the task set.
+# aws ecs delete-task-set --cluster cluster --service service --task-set someid
+
 # Update blue listener to point to green TG.
 # Update green listener to point to blue TG.
 # 
