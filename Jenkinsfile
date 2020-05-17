@@ -207,9 +207,9 @@ pipeline {
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
-                    echo "The loaded template: ${listenerTemplateJson}"
+                    echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
-                    listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
+                    // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
                     writeJSON(file: listenerTemplateJson, json: deregisterTaskDefResult, pretty: 2)
                 }
             }
