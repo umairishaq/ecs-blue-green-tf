@@ -212,7 +212,7 @@ pipeline {
                                 {
                                     "Type": "forward",
                                     "ForwardConfig": {
-                                        "TargetGroups": ${tgs}
+                                        "TargetGroups": ${JsonOutput.toJson(tgs)}
                                     }
                                 }
                             ]
