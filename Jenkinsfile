@@ -203,11 +203,34 @@ pipeline {
                     def greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
                     def tgs = [blueTG, greenTG]
 
+
+                    def content = """
+                        {
+                            "ListenerArn": "$env.BLUE_TARGET_GROUP_ARN",
+                            "DefaultActions": [
+                                {
+                                    "Type": "forward",
+                                    "ForwardConfig": {
+                                        "TargetGroups": [
+                                            {
+                                                "Weight": 100,
+                                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-Green-1JL00XOVE9SQX/6680613ad3b1cf37"
+                                            },
+                                            {
+                                                "Weight": 0,
+                                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-BlueS-PW6LH1YWE0R7/eca651acc15f1fb4"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    """
                     def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
                     // def listenerTemplateFile = 'infrastructure/ListenerDefaultAction.template.json'
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
-                    def listenerTemplateJson = readJSON(file: listenerTemplateFile, returnPojo: true)
+                    def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     def builder = new JsonBuilder(listenerTemplateJson)
 
                     echo "The loaded template: ${JsonOutput.toJson(tgs)}"
@@ -215,7 +238,7 @@ pipeline {
                     // echo "The loaded template: ${builder['DefaultActions']['ForwardConfig']['TargetGroups']}"
                     echo "The loaded template: ${builder.toString()}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
-                    builder.ListerArn = "some new arn"
+                    builder['ListerArn'] = "some new arn"
                     // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
                     writeJSON(file: defaultActionsFile, json: listenerTemplateJson, pretty: 2)
                 }
