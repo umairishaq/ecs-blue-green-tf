@@ -201,14 +201,22 @@ pipeline {
             agent any
             steps{
                 script{
-                    def blueTG = ["Weight": 20, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
-                    def greenTG = ["Weight": 200, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    def blueTG = null
+                    def greenTG = null
+                    if ( env.NEXT_ENV == 'Green' ){
+                        blueTG = ["Weight": 0, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 100, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
+                    else{
+                        blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
                     def tgs = [blueTG, greenTG]
 
 
-                    def content = """
+                    def listenerDefaultActionsTemplate = """
                         {
-                            "ListenerArn": "$env.GREEN_LISTENER_ARN",
+                            "ListenerArn": "$env.BLUE_LISTENER_ARN",
                             "DefaultActions": [
                                 {
                                     "Type": "forward",
@@ -220,23 +228,14 @@ pipeline {
                         }
                     """
                     def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
-                    // def listenerTemplateFile = 'infrastructure/ListenerDefaultAction.template.json'
-                    // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
-                    def listenerTemplateJson = readJSON(file: listenerTemplateFile)
-                    // def builder = new JsonBuilder(listenerTemplateJson)
                     
-                    def slurped = new JsonSlurperClassic().parseText(content)
+                    def listerDefaultActionJson = new JsonSlurperClassic().parseText(listenerDefaultActionsTemplate)
 
-                    echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     echo "==============================================="
-                    // echo "The loaded template: ${builder['DefaultActions']['ForwardConfig']['TargetGroups']}"
-                    // echo "The Builder: ${builder.toString()}"
-                     echo "The Builder: ${listenerTemplateJson['ListenerArn']}"
-                    listenerTemplateJson['ListenerArn'] = 'Some new arn'
-                    // builder['ListerArn'] = "some new arn"
-                    // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
-                    writeJSON(file: defaultActionsFile, json: slurped, pretty: 2)
+                     echo "The formed rules: ${listerDefaultActionJson.toString()}"
+
+                    writeJSON(file: defaultActionsFile, json: listerDefaultActionJson, pretty: 2)
                 }
             }
         }
