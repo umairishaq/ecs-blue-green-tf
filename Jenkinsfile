@@ -1,3 +1,5 @@
+import groovy.json.JsonOutput
+
 pipeline {
     agent none
     environment { 
@@ -196,11 +198,10 @@ pipeline {
             agent any
             steps{
                 script{
-                    import groovy.json.JsonOutput
-
                     def blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
                     def greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
                     def tgs = [blueTG, greenTG]
+
                     def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
                     // def listenerTemplateFile = 'infrastructure/ListenerDefaultAction.template.json'
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
