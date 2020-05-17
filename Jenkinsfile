@@ -238,7 +238,7 @@ pipeline {
                     // echo "The loaded template: ${builder['DefaultActions']['ForwardConfig']['TargetGroups']}"
                     echo "The loaded template: ${builder.toString()}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
-                    builder['ListerArn'] = "some new arn"
+                    // builder['ListerArn'] = "some new arn"
                     // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
                     writeJSON(file: defaultActionsFile, json: listenerTemplateJson, pretty: 2)
                 }
