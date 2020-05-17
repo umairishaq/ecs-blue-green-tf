@@ -1,6 +1,7 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+import groovy.json.JsonSlurperClassic
 
 pipeline {
     agent none
@@ -212,7 +213,7 @@ pipeline {
                                 {
                                     "Type": "forward",
                                     "ForwardConfig": {
-                                        "TargetGroups": ${JsonOutput.toJson(tgs)}
+                                        "TargetGroups": ${JsonOutput.prettyPrint(JsonOutput.toJson(tgs))}
                                     }
                                 }
                             ]
@@ -222,7 +223,7 @@ pipeline {
                     // def listenerTemplateFile = 'infrastructure/ListenerDefaultAction.template.json'
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
-                    def listenerTemplateJson = readJSON(file: listenerTemplateFile)
+                    // def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     // def builder = new JsonBuilder(listenerTemplateJson)
                     
                     def slurped = new JsonSlurper().parseText(content)
