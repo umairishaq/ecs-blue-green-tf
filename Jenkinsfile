@@ -4,7 +4,7 @@ pipeline {
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
     }
     parameters{
-        string(name: 'oldest_Time', defaultValue: new Date().toString())
+        string(name: 'oldest_Time', defaultValue: 'Mon May 11 15:15:10 UTC 2020')
     }
     stages {
         // stage('Build') {
