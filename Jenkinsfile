@@ -113,67 +113,6 @@ pipeline {
                 }
             }
         }
-        stage('DeleteDeployment'){
-            agent any
-            steps{
-                script{
-                    // Read the current task family
-                    def taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
-                    def taskDefinition = readJSON(file: taskDefFile)
-                    def currentTaskFamily = 'task-definition/' + taskDefinition.family
-
-                    // aws ecs delete-task-set --cluster cluster --service service --task-set someid
-
-                    // Read all the TaskSets(deployments) for the cluster.
-                    def describeClusterResult = sh (
-                    script: "aws ecs describe-services --services $SERVICE_ARN --cluster $CLUSTER_ARN",
-                    returnStdout: true
-                    ).trim()
-                    def clusterDetails = readJSON(text: describeClusterResult)
-
-                    // Find the oldest TaskSet with the current TaskDefintion family.
-                    def oldestTime = new Date()
-                    def taskDefArnToDeactivate = ''
-                    def taskSetIdToDelete = ''
-
-                    if (clusterDetails.services[0].taskSets.size() >= 5){
-                        clusterDetails.services[0].taskSets.eachWithIndex { a, i -> createdAt = new Date((long)(a.createdAt*1000))
-                        if (createdAt < oldestTime){
-                            oldestTime = createdAt
-                            if (a.taskDefinition.contains(currentTaskFamily)){
-                                taskDefArnToDeactivate = a.taskDefinition
-                                taskSetIdToDelete = a.id
-                            }
-                        }
-                    }
-                    echo "This is oldest TastSet creation time: ${oldestTime}"
-                    echo "This is TaskDefinition ARN to delete: ${taskDefArnToDeactivate}"
-                    echo "This is StackSet id to delete: ${taskSetIdToDelete}"
-
-                    // Delete the TaskSet(deployment)
-                    def deleteTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.DELETE_TASK_SET_OUTPUT
-                    def deleteTaskSetResult = sh (
-                    script: "aws ecs delete-task-set --cluster $CLUSTER_ARN --service SERVICE_ARN --task-set ${taskSetIdToDelete}",
-                    returnStdout: true
-                    ).trim()
-
-                    writeJSON(file: deleteTaskSetOutputFile, json: deleteTaskSetResult, pretty: 2)
-                    echo "Delete TaskSet: ${deleteTaskSetResult}"
-
-                    // aws ecs deregister-task-definition --task-definition curler:1
-                    // Deregister old TaskDefinition
-                    def deregisterTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.DEREGISTER_TASK_DEF_OUTPUT
-                    def deregisterTaskDefResult = sh (
-                    script: "aws ecs deregister-task-definition --task-definition ${taskDefArnToDeactivate}",
-                    returnStdout: true
-                    ).trim()
-
-                    writeJSON(file: deregisterTaskDefOutputFile, json: deregisterTaskDefResult, pretty: 2)
-                    echo "Deregister TaskDefinition: ${deregisterTaskDefResult}"
-                    }
-                }
-            }
-        }
         stage('UpdatePrimaryTaskSet'){
             agent any
             steps{
@@ -188,6 +127,68 @@ pipeline {
                         ).trim()
                         echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
                         writeJSON(file: upatePrimaryTaskSetOutputFile, json: updatePrimaryTaskSetOutput, pretty: 2)
+                }
+            }
+        }
+        stage('DeleteDeployment'){
+            agent any
+            steps{
+                script{
+                    // Read the current task family
+                    def taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
+                    def taskDefinition = readJSON(file: taskDefFile)
+                    def currentTaskFamily = 'task-definition/' + taskDefinition.family
+
+                    // Read all the TaskSets(deployments) for the cluster.
+                    def describeClusterResult = sh (
+                    script: "aws ecs describe-services --services $SERVICE_ARN --cluster $CLUSTER_ARN",
+                    returnStdout: true
+                    ).trim()
+                    def clusterDetails = readJSON(text: describeClusterResult)
+
+                    // Find the oldest TaskSet(deployment).
+                    def oldestTime = new Date()
+                    def taskDefArnToDeactivate = ''
+                    def taskSetIdToDelete = ''
+
+                    if (clusterDetails.services[0].taskSets.size() >= 5){
+                        clusterDetails.services[0].taskSets.eachWithIndex { a, i -> createdAt = new Date((long)(a.createdAt*1000))
+                        if (createdAt < oldestTime){
+                            oldestTime = createdAt
+                            taskDefArnToDeactivate = a.taskDefinition
+                            taskSetIdToDelete = a.id
+
+                            if (a.taskDefinition.contains(currentTaskFamily)){
+                                // Uncomment to delete oldest TaskSet of the same family
+                                // taskDefArnToDeactivate = a.taskDefinition
+                                // taskSetIdToDelete = a.id
+                            }
+                        }
+                    }
+                    echo "This is oldest TastSet creation time: ${oldestTime}"
+                    echo "This is TaskDefinition ARN to delete: ${taskDefArnToDeactivate}"
+                    echo "This is StackSet id to delete: ${taskSetIdToDelete}"
+
+                    // Delete the TaskSet(deployment)
+                    def deleteTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.DELETE_TASK_SET_OUTPUT
+                    def deleteTaskSetResult = sh (
+                    script: "aws ecs delete-task-set --cluster $CLUSTER_ARN --service $SERVICE_ARN --task-set ${taskSetIdToDelete}",
+                    returnStdout: true
+                    ).trim()
+
+                    writeJSON(file: deleteTaskSetOutputFile, json: deleteTaskSetResult, pretty: 2)
+                    echo "Delete TaskSet: ${deleteTaskSetResult}"
+
+                    // Deregister old TaskDefinition
+                    def deregisterTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.DEREGISTER_TASK_DEF_OUTPUT
+                    def deregisterTaskDefResult = sh (
+                    script: "aws ecs deregister-task-definition --task-definition ${taskDefArnToDeactivate}",
+                    returnStdout: true
+                    ).trim()
+
+                    writeJSON(file: deregisterTaskDefOutputFile, json: deregisterTaskDefResult, pretty: 2)
+                    echo "Deregister TaskDefinition: ${deregisterTaskDefResult}"
+                    }
                 }
             }
         }
