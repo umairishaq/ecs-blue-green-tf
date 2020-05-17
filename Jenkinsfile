@@ -196,6 +196,8 @@ pipeline {
             agent any
             steps{
                 script{
+                    import groovy.json.JsonOutput
+                    
                     def blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
                     def greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
                     def tgs = [blueTG, greenTG]
@@ -205,7 +207,7 @@ pipeline {
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     listenerTemplateJson.ListenerArn = "Some new arn"
-                    listenerTemplateJson.DefaultActions.ForwardConfig = JsonOutput.toJson(tgs)
+                    listenerTemplateJson.DefaultActions.ForwardConfig = JsonOutput.toJson(tgs
                     writeJSON(file: listenerTemplateJson, json: deregisterTaskDefResult, pretty: 2)
                 }
             }
