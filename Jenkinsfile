@@ -5,6 +5,7 @@ pipeline {
     }
     parameters{
         string(name: 'oldest_Time', defaultValue: 'Mon May 11 15:15:10 UTC 2020')
+        string(name: 'lastTaskDefinitionWithSameFamily', defaultValue: 'Some Task Definition ARN')
     }
     stages {
         // stage('Build') {
@@ -126,6 +127,9 @@ pipeline {
                     ).trim()
 
                     def oldestTime = new Date()
+                    def taskDefinitionFamily = 'task-definition/BlueTaskDefinition'
+                    def previousTaskDefArn = ''
+                    def taskSetId = ''
                     def clusterDetails = readJSON(text: describeClusterResult)
                     clusterDetails.services[0].taskSets.eachWithIndex { a, i -> updateTime = new Date((long)(a.createdAt*1000))
                         echo "Index ${i}, time ${updateTime}"
@@ -133,9 +137,15 @@ pipeline {
                         if (updateTime < oldestTime){
                             env.oldest_Time = updateTime.toString()
                             oldestTime = updateTime
+                            if (a.taskDefinition.contains(taskDefinitionFamily)){
+                                previousTaskDefArn = a.taskDefinition
+                                taskSetId = a.id
+                            }
                         }
                     }
                     echo "This is time: ${updateTime}"
+                    echo "This is ARN: ${previousTaskDefArn}"
+                    echo "This is ID: ${taskSetId}"
                 }
             }
         }
