@@ -231,12 +231,13 @@ pipeline {
                     // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
-                    def builder = new JsonBuilder(listenerTemplateJson)
+                    // def builder = new JsonBuilder(listenerTemplateJson)
 
                     echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     echo "==============================================="
                     // echo "The loaded template: ${builder['DefaultActions']['ForwardConfig']['TargetGroups']}"
-                    echo "The loaded template: ${builder.toString()}"
+                    // echo "The Builder: ${builder.toString()}"
+                     echo "The Builder: ${listenerTemplateJson['ListenerArn']}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
                     // builder['ListerArn'] = "some new arn"
                     // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
