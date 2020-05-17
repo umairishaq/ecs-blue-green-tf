@@ -1,6 +1,6 @@
 import groovy.json.JsonOutput
-import groovy.json.JsonBuilder
-import groovy.json.JsonSlurper
+// import groovy.json.JsonBuilder
+// import groovy.json.JsonSlurper
 import groovy.json.JsonSlurperClassic
 
 pipeline {
@@ -227,7 +227,7 @@ pipeline {
                             ]
                         }
                     """
-                    def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
+                    // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
                     
                     def listerDefaultActionJson = new JsonSlurperClassic().parseText(listenerDefaultActionsTemplate)
@@ -236,6 +236,13 @@ pipeline {
                      echo "The formed rules: ${listerDefaultActionJson.toString()}"
 
                     writeJSON(file: defaultActionsFile, json: listerDefaultActionJson, pretty: 2)
+
+                    // Call the api to perform the swap
+                    def modifyProdListenerResult = sh (
+                    script: "aws elbv2 modify-listener --listener-arn $BLUE_LISTENER_ARN --cli-input-json file://${defaultActionsFile}",
+                    returnStdout: true
+                    ).trim()
+                    echo "The modify result: ${modifyProdListenerResult}"
                 }
             }
         }
