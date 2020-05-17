@@ -135,6 +135,54 @@ pipeline {
         //         }
         //     }
         // }
+        stage('SwapTestListener'){
+            agent any
+            steps{
+                script{
+                    def blueTG = null
+                    def greenTG = null
+                    if ( env.NEXT_ENV == 'Green' ){
+                        blueTG = ["Weight": 0, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 100, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
+                    else{
+                        blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
+                    def tgs = [blueTG, greenTG]
+
+
+                    def listenerDefaultActionsTemplate = """
+                        {
+                            "ListenerArn": "$env.GREEN_TARGET_GROUP_ARN",
+                            "DefaultActions": [
+                                {
+                                    "Type": "forward",
+                                    "ForwardConfig": {
+                                        "TargetGroups": ${JsonOutput.prettyPrint(JsonOutput.toJson(tgs))}
+                                    }
+                                }
+                            ]
+                        }
+                    """
+                    def testDefaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.TEST_LISTENER_DEFAULT_ACTION_OUTPUT
+                    
+                    def listerDefaultActionJson = new JsonSlurperClassic().parseText(listenerDefaultActionsTemplate)
+
+                    echo "==============================================="
+                     echo "The formed rules: ${listerDefaultActionJson.toString()}"
+
+                    writeJSON(file: testDefaultActionsFile, json: listerDefaultActionJson, pretty: 2)
+
+                    // Call the api to perform the swap
+                    def modifyTestListenerResult = sh (
+                    script: "aws elbv2 modify-listener --listener-arn $GREEN_LISTENER_ARN --cli-input-json file://${testDefaultActionsFile}",
+                    returnStdout: true
+                    ).trim()
+                    echo "The modify result: ${modifyTestListenerResult}"
+                }
+            }
+        }
         // stage('DeleteDeployment'){
         //     agent any
         //     steps{
