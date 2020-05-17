@@ -4,7 +4,7 @@ pipeline {
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
     }
     parameters{
-        Date(name: 'oldest_Time', null)
+        string(name: 'oldest_Time', null)
     }
     stages {
         // stage('Build') {
@@ -131,7 +131,7 @@ pipeline {
                         echo "Index ${i}, time ${updateTime}"
                         echo "..................................................."
                         if (updateTime < oldestTime){
-                            env.oldest_Time = updateTime
+                            env.oldest_Time = updateTime.toString()
                             oldestTime = updateTime
                         }
                     }
@@ -143,7 +143,8 @@ pipeline {
             agent any
             steps{
                 script{
-                    echo "This variable from previous stage: ${env.oldest_Time}"
+                    def lt = new Date(env.oldest_Time)
+                    echo "This variable from previous stage: ${lt}"
                 }
             }
         }
