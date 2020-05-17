@@ -122,11 +122,23 @@ pipeline {
                     returnStdout: true
                     ).trim()
 
+                    def oldestTime = new Date()
                     def clusterDetails = readJSON(text: describeClusterResult)
                     clusterDetails.services[0].taskSets.eachWithIndex { a, i -> updateTime = new Date((long)(a.createdAt*1000))
                         echo "Index ${i}, time ${updateTime}"
                         echo "..................................................."
+                        if (updateTime < oldestTime){
+                            oldestTime = updateTime
+                        }
                     }
+                }
+            }
+        }
+        stage('TestingVariable'){
+            agent any
+            steps{
+                script{
+                    echo "This variable from previous stage: ${oldestTime}"
                 }
             }
         }
