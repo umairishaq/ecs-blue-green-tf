@@ -4,7 +4,7 @@ pipeline {
         AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
     }
     parameters{
-        string(name: 'oldest_Time', null)
+        string(name: 'oldest_Time', defaultValue: '')
     }
     stages {
         // stage('Build') {
