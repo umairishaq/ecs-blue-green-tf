@@ -68,4 +68,11 @@ sleep 30
 
 # Update blue listener to point to green TG.
 # Update green listener to point to blue TG.
-# 
+aws elbv2 modify-rule \
+            --actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-Green-1JL00XOVE9SQX/6680613ad3b1cf37 \
+            --conditions Field=path-pattern,Values='/images/*'
+            --rule-arn arn:aws:elasticloadbalancing:us-west-2:123456789012:listener-rule/app/my-load-balancer/50dc6c495c0c9188/f2f7dc8efc522ab2/9683b2d02a6cabee
+
+
+
+aws elbv2 modify-listener --listener-arn arn:aws:elasticloadbalancing:us-east-1:807080734664:listener/app/MyTes-LoadB-GUJPHAD258YD/299cae4d5acda2fb/ce7a66246153ef61 --cli-input-json file://infrastructure/ListenerDefaultAction.template.json
