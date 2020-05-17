@@ -201,14 +201,14 @@ pipeline {
             agent any
             steps{
                 script{
-                    def blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
-                    def greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    def blueTG = ["Weight": 20, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                    def greenTG = ["Weight": 200, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
                     def tgs = [blueTG, greenTG]
 
 
                     def content = """
                         {
-                            "ListenerArn": "$env.BLUE_LISTENER_ARN",
+                            "ListenerArn": "$env.GREEN_LISTENER_ARN",
                             "DefaultActions": [
                                 {
                                     "Type": "forward",
