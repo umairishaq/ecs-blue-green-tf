@@ -209,7 +209,7 @@ pipeline {
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     echo "The loaded template: ${listenerTemplateJson}"
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
-                    listenerTemplateJson['DefaultActions']['ForwardConfig'] = tgs
+                    listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
                     writeJSON(file: listenerTemplateJson, json: deregisterTaskDefResult, pretty: 2)
                 }
             }
