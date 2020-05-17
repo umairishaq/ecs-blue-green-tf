@@ -1,5 +1,6 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
 
 pipeline {
     agent none
@@ -206,21 +207,12 @@ pipeline {
 
                     def content = """
                         {
-                            "ListenerArn": "$env.BLUE_TARGET_GROUP_ARN",
+                            "ListenerArn": "$env.BLUE_LISTENER_ARN",
                             "DefaultActions": [
                                 {
                                     "Type": "forward",
                                     "ForwardConfig": {
-                                        "TargetGroups": [
-                                            {
-                                                "Weight": 100,
-                                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-Green-1JL00XOVE9SQX/6680613ad3b1cf37"
-                                            },
-                                            {
-                                                "Weight": 0,
-                                                "TargetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:807080734664:targetgroup/MyTes-BlueS-PW6LH1YWE0R7/eca651acc15f1fb4"
-                                            }
-                                        ]
+                                        "TargetGroups": ${tgs}
                                     }
                                 }
                             ]
@@ -232,6 +224,8 @@ pipeline {
                     def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
                     def listenerTemplateJson = readJSON(file: listenerTemplateFile)
                     // def builder = new JsonBuilder(listenerTemplateJson)
+                    
+                    def slurped = new JsonSlurper().parseText(content)
 
                     echo "The loaded template: ${JsonOutput.toJson(tgs)}"
                     echo "==============================================="
@@ -241,7 +235,7 @@ pipeline {
                     listenerTemplateJson['ListenerArn'] = 'Some new arn'
                     // builder['ListerArn'] = "some new arn"
                     // listenerTemplateJson['DefaultActions']['ForwardConfig']['TargetGroups'] = JsonOutput.toJson(tgs)
-                    writeJSON(file: defaultActionsFile, json: listenerTemplateJson, pretty: 2)
+                    writeJSON(file: defaultActionsFile, json: slurped, pretty: 2)
                 }
             }
         }
