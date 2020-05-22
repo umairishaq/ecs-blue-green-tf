@@ -168,8 +168,14 @@ pipeline {
             }
         }
         stage ('ConfirmationStage') {
-            input("Ready to SWAP production?")
-            echo "Moving on to perform SWAP ..................."
+            agent any
+            input {
+                message "Ready to SWAP production?"
+                ok "Yes, go ahead."
+            }
+            steps{
+                echo "Moving on to perform SWAP ..................."
+            }            
         }
         stage('SwapProd'){
             agent any
