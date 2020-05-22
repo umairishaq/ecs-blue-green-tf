@@ -81,7 +81,7 @@ pipeline {
                     def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
                     echo "********************************"
                     sh 'pwd'
-                    writeJSON(file: "${registerTaskDefOutputFile}", json: registerTaskDefinitionOutput, pretty: 2)
+                    writeJSON(file: "infrastructure/registerTaskDefOutput.json", json: registerTaskDefinitionOutput, pretty: 2)
                     echo "********************************${registerTaskDefOutputFile}"
                 }
             }
