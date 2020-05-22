@@ -272,7 +272,7 @@ pipeline {
                     def taskDefArnToDeactivate = ''
                     def taskSetIdToDelete = ''
 
-                    if (clusterDetails.services[0].taskSets.size() >= 5){
+                    if (clusterDetails.services[0].taskSets.size() >= 3){
                         clusterDetails.services[0].taskSets.eachWithIndex { a, i -> createdAt = new Date((long)(a.createdAt*1000))
                         if (createdAt < oldestTime){
                             oldestTime = createdAt
