@@ -15,6 +15,8 @@ pipeline {
         stage('Build') {
             agent any
             steps {
+                echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                sh 'whoami'
                 sh 'make build-image'
             }
         }
