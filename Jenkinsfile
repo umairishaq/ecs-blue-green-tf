@@ -79,7 +79,7 @@ pipeline {
                     echo "Register Task Def result: ${registerTaskDefinitionOutput}"
 
                     def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
-                    writeJSON(file: registerTaskDefOutputFile, json: registerTaskDefinitionOutput, pretty: 2)
+                    writeJSON(file: "${registerTaskDefOutputFile}", json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
