@@ -1,12 +1,13 @@
 import groovy.json.JsonOutput
-// import groovy.json.JsonBuilder
-// import groovy.json.JsonSlurper
 import groovy.json.JsonSlurperClassic
 
 pipeline {
     agent none
+    parameters {
+        string(name: 'awsProfile', defaultValue: 'cicd', description: 'The AWS profile name to resolve credentials.')
+    }
     environment { 
-        AWS_PROFILE = credentials('AWS_CREDENTIALS_PROFILE')
+        AWS_PROFILE = params.awsProfile
     }
     stages {
         stage('Build') {
@@ -118,23 +119,6 @@ pipeline {
                 }
             }
         }
-        stage('UpdatePrimaryTaskSet'){
-            agent any
-            steps{
-                script{
-                    def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
-                    def upatePrimaryTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.UPDATE_PRIMARY_TASK_SET_OUTPUT
-                    def createTaskSetOutput = readJSON(file: createTaskSetOutputFile)
-
-                    def updatePrimaryTaskSetOutput = sh (
-                        script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSet.taskSetArn}",
-                        returnStdout: true
-                        ).trim()
-                        echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
-                        writeJSON(file: upatePrimaryTaskSetOutputFile, json: updatePrimaryTaskSetOutput, pretty: 2)
-                }
-            }
-        }
         stage('SwapTestListener'){
             agent any
             steps{
@@ -183,6 +167,77 @@ pipeline {
                 }
             }
         }
+        stage ('ConfirmationStage') {
+            input("Ready to SWAP production?")
+            echo "Moving on to perform SWAP ..................."
+        }
+        stage('SwapProd'){
+            agent any
+            steps{
+                script{
+                    def blueTG = null
+                    def greenTG = null
+                    if ( env.NEXT_ENV == 'Green' ){
+                        blueTG = ["Weight": 0, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 100, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
+                    else{
+                        blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
+                        greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
+                    }
+                    def tgs = [blueTG, greenTG]
+
+
+                    def listenerDefaultActionsTemplate = """
+                        {
+                            "ListenerArn": "$env.BLUE_LISTENER_ARN",
+                            "DefaultActions": [
+                                {
+                                    "Type": "forward",
+                                    "ForwardConfig": {
+                                        "TargetGroups": ${JsonOutput.prettyPrint(JsonOutput.toJson(tgs))}
+                                    }
+                                }
+                            ]
+                        }
+                    """
+                    // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
+                    def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
+                    
+                    def listerDefaultActionJson = new JsonSlurperClassic().parseText(listenerDefaultActionsTemplate)
+
+                    echo "==============================================="
+                     echo "The formed rules: ${listerDefaultActionJson.toString()}"
+
+                    writeJSON(file: defaultActionsFile, json: listerDefaultActionJson, pretty: 2)
+
+                    // Call the api to perform the swap
+                    def modifyProdListenerResult = sh (
+                    script: "aws elbv2 modify-listener --listener-arn $BLUE_LISTENER_ARN --cli-input-json file://${defaultActionsFile}",
+                    returnStdout: true
+                    ).trim()
+                    echo "The modify result: ${modifyProdListenerResult}"
+                }
+            }
+        }
+        stage('UpdatePrimaryTaskSet'){
+            agent any
+            steps{
+                script{
+                    def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
+                    def upatePrimaryTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.UPDATE_PRIMARY_TASK_SET_OUTPUT
+                    def createTaskSetOutput = readJSON(file: createTaskSetOutputFile)
+
+                    def updatePrimaryTaskSetOutput = sh (
+                        script: "aws ecs update-service-primary-task-set --service $SERVICE_ARN --cluster $CLUSTER_ARN --primary-task-set ${createTaskSetOutput.taskSet.taskSetArn}",
+                        returnStdout: true
+                        ).trim()
+                        echo "Upate Primary TaskSet Result: ${updatePrimaryTaskSetOutput}"
+                        writeJSON(file: upatePrimaryTaskSetOutputFile, json: updatePrimaryTaskSetOutput, pretty: 2)
+                }
+            }
+        }
+        
         stage('DeleteDeployment'){
             agent any
             steps{
@@ -242,55 +297,6 @@ pipeline {
                     writeJSON(file: deregisterTaskDefOutputFile, json: deregisterTaskDefResult, pretty: 2)
                     echo "Deregister TaskDefinition: ${deregisterTaskDefResult}"
                     }
-                }
-            }
-        }
-        stage('SwapProd'){
-            agent any
-            steps{
-                script{
-                    def blueTG = null
-                    def greenTG = null
-                    if ( env.NEXT_ENV == 'Green' ){
-                        blueTG = ["Weight": 0, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
-                        greenTG = ["Weight": 100, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
-                    }
-                    else{
-                        blueTG = ["Weight": 100, "TargetGroupArn": env.BLUE_TARGET_GROUP_ARN]
-                        greenTG = ["Weight": 0, "TargetGroupArn": env.GREEN_TARGET_GROUP_ARN]
-                    }
-                    def tgs = [blueTG, greenTG]
-
-
-                    def listenerDefaultActionsTemplate = """
-                        {
-                            "ListenerArn": "$env.BLUE_LISTENER_ARN",
-                            "DefaultActions": [
-                                {
-                                    "Type": "forward",
-                                    "ForwardConfig": {
-                                        "TargetGroups": ${JsonOutput.prettyPrint(JsonOutput.toJson(tgs))}
-                                    }
-                                }
-                            ]
-                        }
-                    """
-                    // def listenerTemplateFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_ACTION_TEMPLATE_FILE
-                    def defaultActionsFile = env.TEMPLATE_BASE_PATH + '/' + env.LISTENER_DEFAULT_ACTION_OUTPUT
-                    
-                    def listerDefaultActionJson = new JsonSlurperClassic().parseText(listenerDefaultActionsTemplate)
-
-                    echo "==============================================="
-                     echo "The formed rules: ${listerDefaultActionJson.toString()}"
-
-                    writeJSON(file: defaultActionsFile, json: listerDefaultActionJson, pretty: 2)
-
-                    // Call the api to perform the swap
-                    def modifyProdListenerResult = sh (
-                    script: "aws elbv2 modify-listener --listener-arn $BLUE_LISTENER_ARN --cli-input-json file://${defaultActionsFile}",
-                    returnStdout: true
-                    ).trim()
-                    echo "The modify result: ${modifyProdListenerResult}"
                 }
             }
         }
