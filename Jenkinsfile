@@ -7,7 +7,7 @@ pipeline {
         string(name: 'awsProfile', defaultValue: 'cicd', description: 'The AWS profile name to resolve credentials.')
     }
     environment { 
-        AWS_PROFILE = ${params.awsProfile}
+        AWS_PROFILE = "${params.awsProfile}"
     }
     stages {
         stage('Build') {
