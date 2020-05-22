@@ -5,9 +5,11 @@ pipeline {
     agent none
     parameters {
         string(name: 'awsProfile', defaultValue: 'cicd', description: 'The AWS profile name to resolve credentials.')
+        string(name: 'awsAccountNumber', defaultValue: '', description: 'The AWS account number to use.')
     }
     environment { 
         AWS_PROFILE = "${params.awsProfile}"
+        AWS_ACCOUNT_NUMBER = "${params.awsAccountNumber}"
     }
     stages {
         stage('Build') {
