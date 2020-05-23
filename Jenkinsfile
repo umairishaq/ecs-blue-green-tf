@@ -2,7 +2,7 @@ import groovy.json.JsonOutput
 import groovy.json.JsonSlurperClassic
 
 pipeline {
-    agent none
+    agent any
     parameters {
         string(name: 'awsProfile', defaultValue: 'cicd', description: 'The AWS profile name to resolve credentials.')
         string(name: 'awsAccountNumber', defaultValue: '', description: 'The AWS account number to use.')
@@ -13,15 +13,11 @@ pipeline {
     }
     stages {
         stage('Build') {
-            agent any
             steps {
-                echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-                sh 'whoami'
                 sh 'make build-image'
             }
         }
         stage('EcrPush') {
-            agent any
             steps {
                 script {
                     readProperties(file: 'Makefile.env').each { key, value -> env[key] = value }
@@ -37,7 +33,6 @@ pipeline {
             }
         }
         stage('SetEnvironment'){
-            agent any
             steps {
                 script {
                     // This step reloads the env with configured values for account number and region in various values.
@@ -48,10 +43,10 @@ pipeline {
             }
         }
         stage('RegisterTaskDefinition') {
-            agent any
             steps {
                 sh 'printenv'
                 script {
+                    echo "gggggggggggggggggggggggggggggggggggggggggggggggggggg ${env.WORKSPACE}"
                     def newImage = sh (
                     script: "make latest_image",
                     returnStdout: true
@@ -87,9 +82,9 @@ pipeline {
             }
         }
         stage('CreateTaskSet') {
-            agent any
             steps{
                 script{
+                    echo "gggggggggggggggggggggggggggggggggggggggggggggggggggg ${env.WORKSPACE}"
                     def taskFamily = 'family'
                     def taskSetTemplateFile = 'file'
                     def taskSetFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_SET_FILE
@@ -127,7 +122,6 @@ pipeline {
             }
         }
         stage('SwapTestListener'){
-            agent any
             steps{
                 script{
                     def blueTG = null
@@ -175,7 +169,6 @@ pipeline {
             }
         }
         stage ('ConfirmationStage') {
-            agent any
             input {
                 message "Ready to SWAP production?"
                 ok "Yes, go ahead."
@@ -185,7 +178,6 @@ pipeline {
             }            
         }
         stage('SwapProd'){
-            agent any
             steps{
                 script{
                     def blueTG = null
@@ -234,7 +226,6 @@ pipeline {
             }
         }
         stage('UpdatePrimaryTaskSet'){
-            agent any
             steps{
                 script{
                     def createTaskSetOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.CREATE_TASK_SET_OUTPUT
@@ -250,9 +241,35 @@ pipeline {
                 }
             }
         }
-        
+        stage('GetPrimaryTaskSet'){
+            steps{
+                script{
+                    // Read all the TaskSets(deployments) for the cluster.
+                    def describeClusterResult = sh (
+                    script: "aws ecs describe-services --services $SERVICE_ARN --cluster $CLUSTER_ARN",
+                    returnStdout: true
+                    ).trim()
+                    def clusterDetails = readJSON(text: describeClusterResult)
+                    def primaryTaskSet = null
+                    clusterDetails.services[0].taskSets.each { a -> 
+                        if (a.status == "PRIMARY"){
+                            primaryTaskSet = a
+                        }
+                    }
+                    echo "The primary TaskSet is: ${PrimaryTaskSet}"
+
+                    // Write the Primary TaskSet to file
+                    def primaryTaskSetFile = env.TEMPLATE_BASE_PATH + '/' + 'previousPrimaryTaskSet.json'
+                    writeJSON(file: primaryTaskSetFile, json: primaryTaskSet, pretty: 2)
+
+                    // Read the file and print the variables
+                    def primaryTaskSetJson = readJSON(file: taskSetTemplateFile)
+                    echo "From file iiiiiiiiiiiiiiiiiiiiiidddddddddddddd: ${primaryTaskSetJson.id}"
+                    echo "From deffiiiiiiiiiiiiiiinittttttttttttttooooon: ${primaryTaskSetJson.taskDefinition}"
+                }
+            }
+        }
         stage('DeleteDeployment'){
-            agent any
             steps{
                 script{
                     // Read the current task family
@@ -266,6 +283,7 @@ pipeline {
                     returnStdout: true
                     ).trim()
                     def clusterDetails = readJSON(text: describeClusterResult)
+                    def primarTaskSet = clusterDetails.services[0].taskSets
 
                     // Find the oldest TaskSet(deployment).
                     def oldestTime = new Date()
