@@ -100,14 +100,14 @@ pipeline {
                     taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
                     writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
-                    // def registerTaskDefinitionOutput = sh (
-                    // script: "aws ecs register-task-definition --cli-input-json file://${taskDefFile}",
-                    // returnStdout: true
-                    // ).trim()
-                    // echo "Register Task Def result: ${registerTaskDefinitionOutput}"
+                    def registerTaskDefinitionOutput = sh (
+                    script: "aws ecs register-task-definition --cli-input-json file://${taskDefFile}",
+                    returnStdout: true
+                    ).trim()
+                    echo "Register Task Def result: ${registerTaskDefinitionOutput}"
 
-                    // def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
-                    // writeJSON(file: registerTaskDefOutputFile, json: registerTaskDefinitionOutput, pretty: 2)
+                    def registerTaskDefOutputFile = env.TEMPLATE_BASE_PATH + '/' + env.REGISTER_TASK_DEF_OUTPUT
+                    writeJSON(file: registerTaskDefOutputFile, json: registerTaskDefinitionOutput, pretty: 2)
                 }
             }
         }
