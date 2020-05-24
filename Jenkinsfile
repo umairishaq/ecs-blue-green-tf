@@ -57,7 +57,7 @@ pipeline {
                             primaryTaskSet = a
                         }
                     }
-                    echo "The primary TaskSet is: ${PrimaryTaskSet}"
+                    echo "The primary TaskSet is: ${primaryTaskSet}"
 
                     // Write the Primary TaskSet to file
                     def primaryTaskSetFile = env.TEMPLATE_BASE_PATH + '/' + 'previousPrimaryTaskSet.json'
