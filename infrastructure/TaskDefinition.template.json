@@ -1,11 +1,11 @@
 {
-    "family": "BlueTaskDefinition",
+    "family": "Family Prefix",
     "taskRoleArn": "TASK ROLE",
     "executionRoleArn": "TASK EXEC ROLE",
     "networkMode": "awsvpc",
     "containerDefinitions": [
         {
-            "name": "awesome-api",
+            "name": "my app",
             "image": "nginx",
             "portMappings": [
                 {
@@ -17,8 +17,8 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "MyTestStack2-ServiceLogGroup-15RBFZI8YJIA8",
-                    "awslogs-region": "us-east-1",
+                    "awslogs-group": "Some group",
+                    "awslogs-region": "some region",
                     "awslogs-stream-prefix": "Service"
                 },
                 "secretOptions": []

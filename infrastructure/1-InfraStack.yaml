@@ -86,7 +86,7 @@ Resources:
       TargetType: ip
       VpcId: !Ref Vpc
 
-  BlueListener:
+  LiveListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -99,7 +99,7 @@ Resources:
       Port: !Ref BlueLBPort
       Protocol: HTTP
 
-  GreenListener:
+  TestListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -245,4 +245,10 @@ Outputs:
   GreenLBPort:
     Description: The port the LB is listening for Green TG.
     Value: !Ref GreenLBPort
+  LiveListener:
+    Description: The Live Listener ARN.
+    Value: !Ref LiveListener
+  TestListener:
+    Description: The Test Listener ARN.
+    Value: !Ref TestListener
 
