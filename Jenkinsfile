@@ -64,7 +64,7 @@ pipeline {
                     writeJSON(file: primaryTaskSetFile, json: primaryTaskSet, pretty: 2)
 
                     // Read the file and print the variables
-                    def primaryTaskSetJson = readJSON(file: taskSetTemplateFile)
+                    def primaryTaskSetJson = readJSON(file: primaryTaskSetFile)
                     echo "From file iiiiiiiiiiiiiiiiiiiiiidddddddddddddd: ${primaryTaskSetJson.id}"
                     echo "From deffiiiiiiiiiiiiiiinittttttttttttttooooon: ${primaryTaskSetJson.taskDefinition}"
                 }
