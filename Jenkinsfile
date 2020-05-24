@@ -95,8 +95,8 @@ pipeline {
                     taskDefinitionTemplate.containerDefinitions[0].name = env.APP_NAME
                     taskDefinitionTemplate.containerDefinitions[0].image = newImage
                     taskDefinitionTemplate.containerDefinitions[0].portMappings[0].containerPort = env.APP_PORT.toInteger()
-                    taskDefinitionTemplate.containerDefinitions[0].logConfiguration.options.awslogs-group = env.LOG_GROUP
-                    taskDefinitionTemplate.containerDefinitions[0].logConfiguration.options.awslogs-region = env.REGION
+                    taskDefinitionTemplate.containerDefinitions[0].logConfiguration.options.'awslogs-group' = env.LOG_GROUP
+                    taskDefinitionTemplate.containerDefinitions[0].logConfiguration.options.'awslogs-region' = env.REGION
                     taskDefFile = env.TEMPLATE_BASE_PATH + '/' + env.TASK_DEFINITION_FILE
                     writeJSON(file: taskDefFile, json: taskDefinitionTemplate)
                     
