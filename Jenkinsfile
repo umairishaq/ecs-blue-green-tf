@@ -190,7 +190,7 @@ pipeline {
 
                     // Call the api to perform the swap
                     def modifyTestListenerResult = sh (
-                    script: "aws elbv2 modify-listener --listener-arn $GREEN_LISTENER_ARN --cli-input-json file://${testDefaultActionsFile}",
+                    script: "aws elbv2 modify-listener --listener-arn $TEST_LISTENER_ARN --cli-input-json file://${testDefaultActionsFile}",
                     returnStdout: true
                     ).trim()
                     echo "The modify result: ${modifyTestListenerResult}"
