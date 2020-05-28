@@ -330,7 +330,6 @@ pipeline {
 
                     writeJSON(file: deregisterTaskDefOutputFile, json: deregisterTaskDefResult, pretty: 2)
                     echo "Deregister TaskDefinition: ${deregisterTaskDefResult}"
-                    }
                 }
             }
         }
