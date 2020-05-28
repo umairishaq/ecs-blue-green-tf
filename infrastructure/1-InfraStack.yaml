@@ -18,12 +18,12 @@ Parameters:
     Description: The port the app is listening on. Normally, specified in Dockerfile for a container.
     Type: Number
     Default: 9000
-  BlueLBPort:
-    Description: The port exposed on LB for Blue TG. This maybe different from the App port.
+  LiveLBPort:
+    Description: The port exposed on LB for Live traffic. This maybe different from the App port.
     Type: Number
     Default: 8080
-  GreenLBPort:
-    Description: The port exposed on LB for Green TG. This maybe different from the App port.
+  TestLBPort:
+    Description: The port exposed on LB for Test traffic. This maybe different from the App port.
     Type: Number
     Default: 8081
 
@@ -96,7 +96,7 @@ Resources:
               - TargetGroupArn: !Ref BlueServiceTargetGroup
                 Weight: 100
       LoadBalancerArn: !Ref LoadBalancer
-      Port: !Ref BlueLBPort
+      Port: !Ref LiveLBPort
       Protocol: HTTP
 
   TestListener:
@@ -109,7 +109,7 @@ Resources:
               - TargetGroupArn: !Ref GreenServiceTargetGroup
                 Weight: 100
       LoadBalancerArn: !Ref LoadBalancer
-      Port: !Ref GreenLBPort
+      Port: !Ref TestLBPort
       Protocol: HTTP
 
   # Security Groups:
@@ -121,14 +121,14 @@ Resources:
       SecurityGroupIngress:
         - CidrIp: 0.0.0.0/0
           Description: Allow from anyone on production traffic port Blue
-          FromPort: !Ref BlueLBPort
+          FromPort: !Ref LiveLBPort
           IpProtocol: tcp
-          ToPort: !Ref BlueLBPort
+          ToPort: !Ref LiveLBPort
         - CidrIp: 0.0.0.0/0
           Description: Allow from anyone on production traffic port Green
-          FromPort: !Ref GreenLBPort
+          FromPort: !Ref TestLBPort
           IpProtocol: tcp
-          ToPort: !Ref GreenLBPort
+          ToPort: !Ref TestLBPort
       VpcId: !Ref Vpc
 
   # From the load balancer to the ECS containers.
@@ -239,12 +239,12 @@ Outputs:
     Value: !Ref SecondaryAppListenPort
     Export:
       Name: EcsBGSampleStack:SecondaryAppListenPort
-  BlueLBPort:
-    Description: The port the LB is listening for Blue TG.
-    Value: !Ref BlueLBPort
-  GreenLBPort:
-    Description: The port the LB is listening for Green TG.
-    Value: !Ref GreenLBPort
+  LiveLBPort:
+    Description: The port the LB is listening for Live traffic.
+    Value: !Ref LiveLBPort
+  TestLBPort:
+    Description: The port the LB is listening for test traffic.
+    Value: !Ref TestLBPort
   LiveListener:
     Description: The Live Listener ARN.
     Value: !Ref LiveListener
